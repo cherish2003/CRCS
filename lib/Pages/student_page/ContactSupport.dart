@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 
 class ContactAndSupportScreen extends StatelessWidget {
-  const ContactAndSupportScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contact and Support'),
+        title: Text('Placement Policy'),
         backgroundColor: mainColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          children: const [
+          children: [
             CardView(
-              title: 'Contact Information',
+              title: 'Contact and Policy',
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Email: crcs.helpdesk@srmap.edu.in',
+                    'Please note: Students are encouraged to consult the detailed attendance records for additional clarification on the consolidated attendance mentioned above. Moreover, students should only be marked as "present" if they have devoted a minimum of 80% of the session\'s duration to participation. This especially applies to students who have been involved in placement processes.',
                     style: TextStyle(fontSize: 16, color: thirdColor),
                   ),
                   SizedBox(height: 8),
@@ -44,7 +42,7 @@ class CardView extends StatelessWidget {
   final Widget content;
   final Color color;
 
-  const CardView({super.key, 
+  const CardView({
     required this.title,
     required this.content,
     required this.color,
@@ -62,13 +60,13 @@ class CardView extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
                 color: fourthColor,
               ),
             ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.0),
             content,
           ],
         ),

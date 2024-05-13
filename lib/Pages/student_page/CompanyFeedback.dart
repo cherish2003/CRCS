@@ -7,19 +7,27 @@ class CompanyFeedback extends StatefulWidget {
   _CompanyFeedbackState createState() => _CompanyFeedbackState();
 }
 
+
 class _CompanyFeedbackState extends State<CompanyFeedback> {
   String? selectedCompany;
-  String? selectedInterviewFeedback;
-  List<String> companies = ['Company A', 'Company B', 'Company C', 'Company D'];
-  List<String> interviewFeedbackOptions = ['Hard', 'Easy', 'Not Useful'];
+  bool? gdRound;
+  String? round1Questions;
+  String? technicalRoundQuestions;
+  String? hrRoundQuestions;
 
   TextEditingController feedbackController = TextEditingController();
+
+  List<String> companies = ['Company A', 'Company B', 'Company C', 'Company D'];
+  TextEditingController round1QuestionsController = TextEditingController();
+  TextEditingController technicalRoundQuestionsController =
+      TextEditingController();
+  TextEditingController hrRoundQuestionsController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Company Feedback'),
+        title: Text('Company Feedback'),
         backgroundColor: mainColor,
       ),
       body: SingleChildScrollView(
@@ -28,17 +36,17 @@ class _CompanyFeedbackState extends State<CompanyFeedback> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Select Company',
+              Text(
+                'Company Name',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   color: mainColor,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Select Company',
                   border: OutlineInputBorder(),
                 ),
@@ -55,68 +63,152 @@ class _CompanyFeedbackState extends State<CompanyFeedback> {
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Interview Feedback',
+              SizedBox(height: 16.0),
+              Text(
+                'Pattern of Drive',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   color: mainColor,
                 ),
               ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Interview Feedback',
+              SizedBox(height: 8),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Rounds in the Drive',
                   border: OutlineInputBorder(),
                 ),
-                value: selectedInterviewFeedback,
-                items: interviewFeedbackOptions.map((feedback) {
-                  return DropdownMenuItem<String>(
-                    value: feedback,
-                    child: Text(feedback),
-                  );
-                }).toList(),
+                keyboardType: TextInputType.number,
                 onChanged: (value) {
-                  setState(() {
-                    selectedInterviewFeedback = value;
-                  });
+                  // Handle changes in the number of rounds
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Text('GD Round:'),
+                  SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Text('Yes'),
+                      Radio<bool>(
+                        value: true,
+                        groupValue: gdRound,
+                        onChanged: (value) {
+                          setState(() {
+                            gdRound = value;
+                          });
+                        },
+                      ),
+                      Text('No'),
+                      Radio<bool>(
+                        value: false,
+                        groupValue: gdRound,
+                        onChanged: (value) {
+                          setState(() {
+                            gdRound = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'Questions for Round 1',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: round1QuestionsController,
+                decoration: InputDecoration(
+                  labelText: 'Round 1 Questions',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: null,
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'Questions for Technical Round',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: technicalRoundQuestionsController,
+                decoration: InputDecoration(
+                  labelText: 'Technical Round Questions',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: null,
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'Questions for HR Round',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: hrRoundQuestionsController,
+                decoration: InputDecoration(
+                  labelText: 'HR Round Questions',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: null,
+              ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: feedbackController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Enter Feedback',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 5,
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.0),
               SizedBox(
-                width: double.infinity, // Set the width to match the parent
-                height: 50, // Set the desired height
+                width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
                   onPressed: () {
                     // Add logic to submit feedback
                     print('Selected Company: $selectedCompany');
-                    print('Interview Feedback: $selectedInterviewFeedback');
+                    print('GD Round: $gdRound');
+                    print('Round 1 Questions: $round1Questions');
+                    print(
+                        'Technical Round Questions: $technicalRoundQuestions');
+                    print('HR Round Questions: $hrRoundQuestions');
                     print('Feedback: ${feedbackController.text}');
                     // Clear input fields after submitting feedback
                     setState(() {
                       selectedCompany = null;
-                      selectedInterviewFeedback = null;
+                      gdRound = null;
+                      round1QuestionsController.clear();
+                      technicalRoundQuestionsController.clear();
+                      hrRoundQuestionsController.clear();
                       feedbackController.clear();
                     });
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: mainColor,
-                  ),
-                  child: const Text(
+                  child: Text(
                     'Submit Feedback',
                     style: TextStyle(
                       color: Colors.white,
                     ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: mainColor,
                   ),
                 ),
               ),

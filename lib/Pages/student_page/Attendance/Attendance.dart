@@ -1,3 +1,4 @@
+import 'package:crcs/Pages/student_page/Attendance/Student_attendance.dart';
 import 'package:crcs/components/rippleEffect/ripple_animation.dart';
 import 'package:flutter/material.dart';
 
@@ -173,11 +174,16 @@ class _AttendanceState extends State<Attendance> {
                   },
                 ),
 
+                
                 CheckboxButton(
                   label: 'Take attendance',
+                
                   isSelected: isDomainSelected,
                   onSelected: (value) {
-                   
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StudentAttendancePage()));
                   },
                 ),
               ],

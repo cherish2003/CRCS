@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
@@ -29,6 +30,72 @@ class _RegisterUserState extends State<RegisterUser> {
   Map<String, dynamic>? deviceInfo;
   String? errorMessage;
   String? sucessMessage;
+  bool loadingState = false;
+
+  Future signinClick() async {
+    setState(() {
+      loadingState = true; // Set loading state to true when registration starts
+      errorMessage = null; // Clear any previous error messages
+    });
+    // Retrieve input field data
+    Map<String, dynamic> formData = {};
+    for (var formValue in FormValues) {
+      String label = formValue['label'];
+      if (formValue['ParentId'] == int.parse(userRole!)) {
+        formData[label] = controllers[label]!.text;
+      }
+    }
+    String selectedRoleLabel = "";
+    for (var role in Roles) {
+      if (role['id'] == int.parse(userRole!)) {
+        selectedRoleLabel = role['label'];
+        break;
+      }
+    }
+    print("Selected Role: $selectedRoleLabel");
+    // Get device information
+    final info = await getDeviceInfo();
+    setState(() {
+      deviceInfo = info;
+    });
+
+    var regBody = {
+      "UserRole": selectedRoleLabel,
+      "InputInfo": formData,
+      "deviceInfo": deviceInfo
+    };
+
+    try {
+      var response = await http.post(Uri.parse(register),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(regBody));
+
+      var responseData = jsonDecode(response.body);
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      if (responseData['success']) {
+        var token = responseData['token'];
+        prefs.setString("Token", token);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => StudentNavigationPage()));
+      } else {
+        setState(() {
+          errorMessage = responseData['error'];
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage =
+            "Failed to register. Please try again later."; // Display a generic error message
+      });
+    } finally {
+      setState(() {
+        loadingState =
+            false; // Set loading state to false when registration completes
+      });
+    }
+    // print(response.body);
+  }
 
   late Map<String, TextEditingController> controllers;
 
@@ -125,69 +192,32 @@ class _RegisterUserState extends State<RegisterUser> {
                 ),
                 const SizedBox(width: 20, height: 20),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-
-                      // Retrieve input field data
-                      Map<String, dynamic> formData = {};
-                      for (var formValue in FormValues) {
-                        String label = formValue['label'];
-                        if (formValue['ParentId'] == int.parse(userRole!)) {
-                          formData[label] = controllers[label]!.text;
-                        }
-                      }
-                      String selectedRoleLabel = "";
-                      for (var role in Roles) {
-                        if (role['id'] == int.parse(userRole!)) {
-                          selectedRoleLabel = role['label'];
-                          break;
-                        }
-                      }
-                      print("Selected Role: $selectedRoleLabel");
-                      // Get device information
-                      final info = await getDeviceInfo();
-                      setState(() {
-                        deviceInfo = info;
-                      });
-
-                      var regBody = {
-                        "UserRole": selectedRoleLabel,
-                        "InputInfo": formData,
-                        "deviceInfo": deviceInfo
-                      };
-
-                      var response = await http.post(Uri.parse(register),
-                          headers: {"Content-Type": "application/json"},
-                          body: jsonEncode(regBody));
-
-                      var responseData = jsonDecode(response.body);
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-
-                      if (responseData['success']) {
-                        var token = responseData['token'];
-                        prefs.setString("Token", token);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StudentNavigationPage()));
-                      } else {
-                        // Clear error message if registration is successful
-                        setState(() {
-                          errorMessage = responseData['error'];
-                        });
-                      }
-                      print(response.body);
-                    }
-                  },
+                  onPressed: loadingState
+                      ? null // Disable button while loading
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            await signinClick();
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(140, 60),
                     backgroundColor: thirdColor,
                     foregroundColor: secondaryColor,
                   ),
-                  icon: const Icon(Icons.how_to_reg_outlined),
-                  label: const Text("Continue"),
+                  icon: loadingState
+                      ? SizedBox(
+                          // Display loading indicator if loading
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: mainColor,
+                          ),
+                        )
+                      : const Icon(Icons.how_to_reg_outlined),
+                  label: loadingState
+                      ? SizedBox.shrink() // Hide label while loading
+                      : const Text("Continue"),
                 ),
                 const SizedBox(height: 40),
                 if (errorMessage != null)

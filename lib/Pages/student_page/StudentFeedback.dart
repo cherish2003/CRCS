@@ -7,17 +7,30 @@ class FeedbackScreen extends StatefulWidget {
   _FeedbackScreenState createState() => _FeedbackScreenState();
 }
 
+
 class _FeedbackScreenState extends State<FeedbackScreen> {
   String? selectedTeacher;
   List<String> teachers = ['Murali', 'Krishna', 'Akhila', 'Cherish Laxman'];
 
   TextEditingController feedbackController = TextEditingController();
 
+  String? selectedMeetingFrequency;
+  List<String> meetingFrequencies = ['Yes', 'No'];
+
+  int? selectedMeetingCount;
+  List<int> meetingCounts = List.generate(10, (index) => index + 1);
+
+  String? selectedConnectionType;
+  List<String> connectionTypes = ['In-person', 'Online'];
+
+  String? selectedMeetingType;
+  List<String> meetingTypes = ['One-on-One', 'Group'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Feedback Screen'),
+        title: Text('Feedback'),
         backgroundColor: mainColor,
       ),
       body: SingleChildScrollView(
@@ -26,7 +39,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Select Teacher',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -34,9 +47,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   color: mainColor,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Select Teacher',
                   border: OutlineInputBorder(),
                 ),
@@ -53,16 +66,128 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: feedbackController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Enter Feedback',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 5,
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.0),
+              Text(
+                'Did your mentor meet you in this month:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select Option',
+                  border: OutlineInputBorder(),
+                ),
+                value: selectedMeetingFrequency,
+                items: meetingFrequencies.map((frequency) {
+                  return DropdownMenuItem<String>(
+                    value: frequency,
+                    child: Text(frequency),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMeetingFrequency = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'How many times did the mentor meet you in this month:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  labelText: 'Select Count',
+                  border: OutlineInputBorder(),
+                ),
+                value: selectedMeetingCount,
+                items: meetingCounts.map((count) {
+                  return DropdownMenuItem<int>(
+                    value: count,
+                    child: Text(count.toString()),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMeetingCount = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'How did your mentor connect with you:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select Option',
+                  border: OutlineInputBorder(),
+                ),
+                value: selectedConnectionType,
+                items: connectionTypes.map((type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedConnectionType = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'How did your mentor meet with you:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: mainColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select Option',
+                  border: OutlineInputBorder(),
+                ),
+                value: selectedMeetingType,
+                items: meetingTypes.map((type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMeetingType = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
               SizedBox(
                 width: double.infinity, // Set the width to match the parent
                 height: 50, // Set the desired height
@@ -71,20 +196,28 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     // Add logic to submit feedback
                     print('Selected Teacher: $selectedTeacher');
                     print('Feedback: ${feedbackController.text}');
+                    print('Meeting Frequency: $selectedMeetingFrequency');
+                    print('Meeting Count: $selectedMeetingCount');
+                    print('Connection Type: $selectedConnectionType');
+                    print('Meeting Type: $selectedMeetingType');
                     // Clear input fields after submitting feedback
                     setState(() {
                       selectedTeacher = null;
                       feedbackController.clear();
+                      selectedMeetingFrequency = null;
+                      selectedMeetingCount = null;
+                      selectedConnectionType = null;
+                      selectedMeetingType = null;
                     });
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: mainColor,
-                  ),
-                  child: const Text(
+                  child: Text(
                     'Submit Feedback',
                     style: TextStyle(
                       color: Colors.white, // Set the font color to white
                     ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: mainColor,
                   ),
                 ),
               ),

@@ -1,8 +1,12 @@
 import 'package:crcs/Pages/student_page/Attendance/Attendance.dart';
+import 'package:crcs/Pages/student_page/Events.dart';
+import 'package:crcs/Pages/student_page/Studentinfo.dart';
+import 'package:crcs/Pages/student_page/mypratice.dart';
+import 'package:crcs/Pages/student_page/performance.dart';
 import 'package:flutter/material.dart';
 import 'package:crcs/Pages/student_page/CompanyFeedback.dart';
 import 'package:crcs/Pages/student_page/ContactSupport.dart';
-import 'package:crcs/Pages/student_page/PlacementCorner.dart';
+import 'package:crcs/Pages/student_page/Studentinfo.dart';
 import 'package:crcs/Pages/student_page/Settings.dart';
 import 'package:crcs/Pages/student_page/StudentFeedback.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
@@ -48,7 +52,7 @@ class StudentNavigationPage extends StatelessWidget {
                 child: Image.asset(
                   'images/BLogo.png', // Replace 'your_image.png' with your image asset path
                   width: 70,
-                  height:70, // Adjust width as needed
+                  height: 70, // Adjust width as needed
                 ),
               ),
             ),
@@ -75,22 +79,41 @@ class StudentNavigationPage extends StatelessWidget {
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Revision Material'),
+              title: const Text('Events'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const StudentNavigationPage()),
+                  MaterialPageRoute(builder: (context) => EventPage()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Placement Corner'),
+              title: const Text('Practice'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPracticeScreen()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Student info'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const CardExample()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('My Performance'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PerformanceScreen()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
@@ -118,12 +141,12 @@ class StudentNavigationPage extends StatelessWidget {
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Contact Us'),
+              title: const Text('Placement Policy'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ContactAndSupportScreen()),
+                      builder: (context) => ContactAndSupportScreen()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),

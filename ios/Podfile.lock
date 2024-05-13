@@ -6,6 +6,7 @@ PODS:
   - Flutter (1.0.0)
   - image_picker_ios (0.0.1):
     - Flutter
+  - MTBBarcodeScanner (5.0.11)
   - nearby_service (0.0.1):
     - Flutter
   - otpless_flutter (0.0.4):
@@ -17,6 +18,9 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
+  - qr_code_scanner (0.2.0):
+    - Flutter
+    - MTBBarcodeScanner
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -32,11 +36,13 @@ DEPENDENCIES:
   - otpless_flutter (from `.symlinks/plugins/otpless_flutter/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
 
 SPEC REPOS:
   trunk:
+    - MTBBarcodeScanner
     - OtplessSDK
 
 EXTERNAL SOURCES:
@@ -56,6 +62,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  qr_code_scanner:
+    :path: ".symlinks/plugins/qr_code_scanner/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   uni_links:
@@ -66,11 +74,13 @@ SPEC CHECKSUMS:
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   image_picker_ios: b545a5f16c0fa88e3ecbbce3ed4de45567a8ec18
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   nearby_service: 6d7cba1a7f3ec4efa2c61515c88a4074a5bc6060
   otpless_flutter: f362824fbefc368cefd4164ae89f951cb8ed2811
   OtplessSDK: a8d6d853e54d10258826bd00eb7d9417edf615b2
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
 
