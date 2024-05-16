@@ -43,10 +43,13 @@ class _CardExampleState extends State<CardExample> {
     if (response.statusCode == 200) {
       // If the server returns a successful response, parse the JSON
       Map<String, dynamic> parsedJson = jsonDecode(response.body);
+      print( parsedJson['data']['stu'][0]);
       setState(() {
         _isLoading = false;
         _studentData = parsedJson['data']['stu'][0];
       });
+      print(_studentData);
+      // prefs.setString("userData", parsedJson['data']['stu'][0]);
     } else {
       // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to load data');

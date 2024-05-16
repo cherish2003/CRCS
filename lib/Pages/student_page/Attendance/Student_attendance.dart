@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:crcs/components/rippleEffect/ripple_animation.dart';
 import 'package:flutter/material.dart';
-import 'package:nearby_service/nearby_service.dart';
 
 class StudentAttendancePage extends StatefulWidget {
   const StudentAttendancePage({Key? key}) : super(key: key);

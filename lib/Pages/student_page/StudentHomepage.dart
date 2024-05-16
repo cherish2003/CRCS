@@ -1,12 +1,92 @@
+import 'dart:convert';
+import 'package:crcs/config.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-
-
-class StudentHomepage extends StatelessWidget {
-  const StudentHomepage({super.key});
+class StudentHomepage extends StatefulWidget {
+  const StudentHomepage({Key? key}) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
+  _StudentHomepageState createState() => _StudentHomepageState();
+}
+
+class _StudentHomepageState extends State<StudentHomepage> {
+  late SharedPreferences _prefs;
+  late String _token;
+  late String _rollno;
+  late String _batch;
+  late Map<String, dynamic> _jsonData;
+
+  late Map<String, int> _counts = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    _prefs = await SharedPreferences.getInstance();
+    _token = _prefs.getString("Token") ?? "";
+    _rollno = _prefs.getString("Rollno") ?? "";
+    _batch = _prefs.getString("Batch") ?? "";
+
+    await fetchPlacementProgress();
+
+    if (_jsonData.isNotEmpty) {
+      // Check if data is not empty
+      _calculateCounts();
+      print(_counts);
+    }
+  }
+
+  Future<void> fetchPlacementProgress() async {
+    print(_token);
+    try {
+      final response = await http.post(
+        Uri.parse('$getStudProgress/$_batch'),
+        headers: {
+          "Authorization": "Bearer $_token",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "rollno": [_rollno]
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final res = jsonDecode(response.body);
+        _jsonData = res['data'];
+        // Process the response data here
+        print(_jsonData['appliedCompany'][_rollno].length);
+      } else {
+        // Handle error response
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle network errors
+      print('Error: $e');
+    }
+  }
+
+  void _calculateCounts() {
+    _counts['appliedCompany'] = _jsonData['appliedCompany'][_rollno].length;
+    _counts['eligibleCompany'] = _jsonData['eligibleCompany'][_rollno].length;
+    _counts['placed'] = _jsonData['placed'][_rollno].length;
+    _counts['shortlistedCompany'] =
+        _jsonData['shortlistedCompany'][_rollno].length;
+    _counts['placed'] = _jsonData['placed'][_rollno].length;
+    _counts['gd'] = _jsonData['stages'][_rollno]['gd'].length;
+    _counts['hr'] = _jsonData['stages'][_rollno]['hr'].length;
+    _counts['inter'] = _jsonData['stages'][_rollno]['inter'].length;
+    _counts['ot'] = _jsonData['stages'][_rollno]['ot'].length;
+    _counts['other'] = _jsonData['stages'][_rollno]['other'].length;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Page'),
@@ -31,7 +111,7 @@ class StudentHomepage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Eligible Companies',
+                    'Your placement info',
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -40,28 +120,66 @@ class StudentHomepage extends StatelessWidget {
                   ),
                   SizedBox(height: 16.0),
                   CompanyTile(
-                    companyName: 'Company A',
-                    type: 'Super Dream',
-                    expectedDate: 'June 10, 2024',
+                    companyName: 'Eligible Companies',
+                    count: _counts['eligibleCompany'],
                   ),
                   Divider(), // Line break
                   CompanyTile(
-                    companyName: 'Company B',
-                    type: 'Core Dream',
-                    expectedDate: 'June 15, 2024',
+                    companyName: 'Applied Companies',
+                    count: _counts['appliedCompany'],
                   ),
                   Divider(), // Line break
                   CompanyTile(
-                    companyName: 'Company C',
-                    type: 'Dream',
-                    expectedDate: 'June 20, 2024',
+                    companyName: 'Shortlisted Companies',
+                    count: _counts['shortlistedCompany'],
                   ),
                   Divider(), // Line break
                   CompanyTile(
-                    companyName: 'Company D',
-                    type: 'Core',
-                    expectedDate: 'June 25, 2024',
+                    companyName: 'Placed Companies',
+                    count: _counts['placed'],
                   ),
+                  Divider(), // Line break
+                  CompanyTile(
+                    companyName: 'Eligible Companies',
+                    count: _counts['eligibleCompany'],
+                  ),
+                   Divider(),
+                  CompanyTile(
+                    companyName: 'Online test',
+                    count: _counts['ot'],
+                  ),
+                  Divider(),
+                  Text(
+                    'In progress stages',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: fourthColor,
+                    ),
+                  ),
+                  
+                  CompanyTile(
+                    companyName: 'GD',
+                    count: _counts['gd'],
+                  ),
+                  CompanyTile(
+                    companyName: 'Interview',
+                    count: _counts['inter'],
+                  ),
+                  CompanyTile(
+                    companyName: 'HR',
+                    count: _counts['hr'],
+                  ),
+                  CompanyTile(
+                    companyName: 'GD',
+                    count: _counts['gd'],
+                  ),
+
+                  CompanyTile(
+                    companyName: 'other',
+                    count: _counts['other'],
+                  ),
+                  // Line break
                 ],
               ),
             ),
@@ -74,23 +192,19 @@ class StudentHomepage extends StatelessWidget {
 
 class CompanyTile extends StatelessWidget {
   final String companyName;
-  final String type;
-  final String expectedDate;
+  final count;
 
-  const CompanyTile({
-    required this.companyName,
-    required this.type,
-    required this.expectedDate,
-  });
+  const CompanyTile({required this.companyName, required this.count});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(companyName),
-      subtitle: Text('Type: $type\nExpected Date: $expectedDate'),
-      onTap: () {
-        // Handle tile tap
-      },
+      title: Text(
+        '$companyName : $count',
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.w700, color: thirdColor),
+      ),
+      // subtitle: Text('Type: $type\nExpected Date: $expectedDate2'),
     );
   }
 }

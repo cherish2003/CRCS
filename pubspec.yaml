@@ -43,7 +43,8 @@ dependencies:
   otpless_flutter: ^2.1.3
   device_info_plus: ^10.1.0
   http: ^1.2.1
-  nearby_service: ^0.0.7
+  provider: ^6.1.2
+
 
 dev_dependencies:
   flutter_test:

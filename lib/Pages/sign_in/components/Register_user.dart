@@ -75,6 +75,16 @@ class _RegisterUserState extends State<RegisterUser> {
 
       if (responseData['success']) {
         var token = responseData['token'];
+        if (selectedRoleLabel == "Student") {
+          var rollno = responseData['userData']['rollno'];
+          var batch = responseData['userData']['batch'];
+          prefs.setString("Token", token);
+          prefs.setString("Rollno", rollno);
+          prefs.setString("Batch", batch);
+
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => StudentNavigationPage()));
+        }
         prefs.setString("Token", token);
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => StudentNavigationPage()));

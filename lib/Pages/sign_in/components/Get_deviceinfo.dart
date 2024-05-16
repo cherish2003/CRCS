@@ -47,5 +47,6 @@ Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
     'model': data.model,
     'identifierForVendor': data.identifierForVendor,
     'isPhysicalDevice': data.isPhysicalDevice,
+    'macAddress': data.isPhysicalDevice,
   };
 }
