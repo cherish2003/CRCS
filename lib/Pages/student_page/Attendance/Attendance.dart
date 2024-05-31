@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:crcs/Pages/student_page/Attendance/Student_attendance.dart';
-import 'package:crcs/components/rippleEffect/ripple_animation.dart';
+import 'package:crcs/Pages/student_page/Attendance/check_in_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crcs/config.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 import 'package:flutter/material.dart';
 
@@ -129,10 +130,11 @@ class _AttendanceState extends State<Attendance> {
                   label: 'Attendance table ',
                   isSelected: attendance_table,
                   onSelected: (value) {
-                    print(value);
+                    // print(value);
                     setState(() {
                       attendance_table = value;
                     });
+                    
                   },
                 ),
               ],

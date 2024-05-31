@@ -11,8 +11,8 @@ import 'package:crcs/Pages/student_page/Contactus.dart';
 import 'package:crcs/Pages/student_page/StudentFeedback.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
 
-class StudentNavigationPage extends StatelessWidget {
-  const StudentNavigationPage({super.key});
+class Facultymentornavigation extends StatelessWidget {
+  const Facultymentornavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +152,7 @@ class StudentNavigationPage extends StatelessWidget {
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Contact us'),
+              title: const Text('Settings'),
               onTap: () {
                 Navigator.push(
                   context,

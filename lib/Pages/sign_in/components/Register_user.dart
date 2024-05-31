@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:crcs/Pages/FacultyMentor/Facultymentornavigation.dart';
 import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
 import 'package:crcs/Pages/student_page/StudentNavigationPage.dart';
@@ -81,13 +82,18 @@ class _RegisterUserState extends State<RegisterUser> {
           prefs.setString("Token", token);
           prefs.setString("Rollno", rollno);
           prefs.setString("Batch", batch);
+          print(token);
 
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => StudentNavigationPage()));
         }
+        if (selectedRoleLabel == "Faculty mentor") {
+          prefs.setString("Token", token);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => Facultymentornavigation()));
+        }
         prefs.setString("Token", token);
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => StudentNavigationPage()));
+        //to navigate 
       } else {
         setState(() {
           errorMessage = responseData['error'];

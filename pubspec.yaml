@@ -39,11 +39,12 @@ dependencies:
   snippet_coder_utils: ^1.0.15
   cupertino_icons: ^1.0.6
   permission_handler: ^11.3.1
-  carrier_info: ^2.0.8
-  otpless_flutter: ^2.1.3
+  geolocator: ^12.0.0
   device_info_plus: ^10.1.0
   http: ^1.2.1
   provider: ^6.1.2
+  turf: ^0.0.10
+  decimal:
 
 
 dev_dependencies:

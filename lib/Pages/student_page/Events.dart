@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:permission_handler/permission_handler.dart'; // Add this import
 
 const Color mainColor = Color(0xff6a6446);
 const Color secondaryColor = Color(0xfff2f0e4);
@@ -53,31 +51,14 @@ class _EventPageState extends State<EventPage> {
                 'Starts: ${events[index].date.toString()}\nDuration: ${events[index].duration.inHours} hours',
                 style: TextStyle(color: thirdColor),
               ),
-              onTap: () async {
-                bool permissionGranted = await _checkCameraPermission();
-                if (permissionGranted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRScanPage(),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Camera permission denied.'),
-                  ));
-                }
+              onTap: () {
+                // Define what happens when an event is tapped
               },
             ),
           );
         },
       ),
     );
-  }
-
-  Future<bool> _checkCameraPermission() async {
-    final status = await Permission.camera.request();
-    return status.isGranted;
   }
 }
 
@@ -89,46 +70,9 @@ class Event {
   Event({required this.name, required this.date, required this.duration});
 }
 
-class QRScanPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _QRScanPageState();
-}
-
-class _QRScanPageState extends State<QRScanPage> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  late QRViewController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Scan QR Code'),
-        backgroundColor: mainColor,
+void main() => runApp(MaterialApp(
+      home: EventPage(),
+      theme: ThemeData(
+        primaryColor: mainColor,
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 4,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      // hi sanju here write logic after scanning
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-}
+    ));

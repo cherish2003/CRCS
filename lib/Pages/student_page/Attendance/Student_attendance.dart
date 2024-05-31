@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:crcs/components/rippleEffect/ripple_animation.dart';
+import 'package:crcs/Pages/student_page/Attendance/check_in_service.dart';
+import 'package:crcs/components/checkmark.dart';
 import 'package:flutter/material.dart';
 
 class StudentAttendancePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Student HomePage",
+        title: const Text("Attendance Page",
             style: TextStyle(color: Colors.white)),
         backgroundColor: mainColor,
       ),
@@ -37,9 +38,10 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        flag = 1;
-                      });
+                    Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CheckInWidget()));
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -53,9 +55,9 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.bluetooth_connected,
-                            size: 26, color: Colors.white),
-                        Text("Bluetooth", style: TextStyle(fontSize: 16)),
+                        Icon(Icons.location_on,
+                            size: 22, color: Colors.white),
+                        Text("Location", style: TextStyle(fontSize: 16)),
                       ],
                     ),
                   ),
@@ -91,7 +93,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    flag = 2;
+                    flag = 3;
                   });
                 },
                 child: Container(
@@ -126,44 +128,47 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                 ),
               )
             else if (flag == 2)
-              RipplesAnimation(
-                onPressed: () {},
-                child: const Text("data"),
-              )
-            else if (flag == 3)
-              Column(
-                children: [
-                  const SizedBox(height: 10),
-                  const Text("Attendance recorded!",
-                      style: TextStyle(fontSize: 20)),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        flag = 0;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color.fromARGB(255, 103, 58, 183),
-                      minimumSize: const Size(100, 60),
-                      maximumSize: const Size(150, 60),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32.0),
-                      ),
-                    ),
-                    child: Row(
+             Center(
+                child: Column(
+                  children: [
+                    const CheckMarkPage(),
+                    const SizedBox(height: 10),
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(width: 8),
-                        const Icon(Icons.logout, size: 26, color: Colors.white),
-                        const SizedBox(width: 10),
-                        const Text("Back", style: TextStyle(fontSize: 18)),
+                        Text("Attendance recorded!",
+                            style: TextStyle(fontSize: 20)),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            flag = 0;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              const Color.fromARGB(255, 103, 58, 183),
+                          minimumSize: const Size(100, 60),
+                          maximumSize: const Size(150, 60),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32.0),
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            SizedBox(width: 8),
+                            Icon(Icons.logout, size: 26, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text("Back", style: TextStyle(fontSize: 18)),
+                          ],
+                        )),
+                  ],
+                ),
+              )
           ],
         ),
       ),

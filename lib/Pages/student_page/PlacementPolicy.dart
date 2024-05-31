@@ -13,19 +13,16 @@ class ContactAndSupportScreen extends StatelessWidget {
         child: ListView(
           children: [
             CardView(
-              title: 'Contact and Policy',
+              title: 'Placement Policy',
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Please note: Students are encouraged to consult the detailed attendance records for additional clarification on the consolidated attendance mentioned above. Moreover, students should only be marked as "present" if they have devoted a minimum of 80% of the session\'s duration to participation. This especially applies to students who have been involved in placement processes.',
+                    'Students you may refer to the detailed attendance for further clarifications on above consolidated attendance, we have not considered Barclays attendance for computing weekly attendance. Also students are marked as "present" only if they have spent minimum of 80% time in the session. Students who have not met 80% in weekly attendance will not be allowed into placement process.',
                     style: TextStyle(fontSize: 16, color: thirdColor),
                   ),
                   SizedBox(height: 8),
-                  Text(
-                    'Phone: 122-344-5555',
-                    style: TextStyle(fontSize: 16, color: thirdColor),
-                  ),
+                  
                 ],
               ),
               color: secondaryColor,
