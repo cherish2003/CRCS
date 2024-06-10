@@ -163,8 +163,11 @@ Future<MentorDetails> fetchMentorDetails() async {
       final data = jsonDecode(res.body);
       print("data ::: $data");
 
-      final mentorData =
-          data['data']['men']; // Corrected the path to access 'men'
+      final mentorData = data['data']['men'];
+      if (mentorData == null) {
+        return MentorDetails.empty();
+      }
+
       return MentorDetails.fromJson(mentorData);
     } else {
       throw Exception("Failed to load mentor details");
@@ -190,11 +193,19 @@ class MentorDetails {
 
   factory MentorDetails.fromJson(Map<String, dynamic> json) {
     return MentorDetails(
-      name: json['name'],
-      email: json['email'],
-      cabin: json['cabin'].toString(), // Ensure cabin is converted to string
-      phoneNumber: json['phoneno']
-          .toString(), // Ensure phoneNumber is converted to string
+      name: json['name'] ?? 'N/A',
+      email: json['email'] ?? 'N/A',
+      cabin: json['cabin'].toString(),
+      phoneNumber: json['phoneno'].toString(),
+    );
+  }
+
+  factory MentorDetails.empty() {
+    return MentorDetails(
+      name: 'N/A',
+      email: 'N/A',
+      cabin: 'N/A',
+      phoneNumber: 'N/A',
     );
   }
 }

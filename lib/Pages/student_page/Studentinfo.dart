@@ -43,7 +43,7 @@ class _CardExampleState extends State<CardExample> {
     if (response.statusCode == 200) {
       // If the server returns a successful response, parse the JSON
       Map<String, dynamic> parsedJson = jsonDecode(response.body);
-      print( parsedJson['data']['stu'][0]);
+      print(parsedJson['data']['stu'][0]);
       setState(() {
         _isLoading = false;
         _studentData = parsedJson['data']['stu'][0];
@@ -60,11 +60,14 @@ class _CardExampleState extends State<CardExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Card Example'),
+        title: const Text('Student info'),
         backgroundColor: mainColor,
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: mainColor,)) // Show loading indicator
+          ? Center(
+              child: CircularProgressIndicator(
+              color: mainColor,
+            )) // Show loading indicator
           : FutureBuilder(
               future: _dataFetchFuture,
               builder: (context, snapshot) {
@@ -114,18 +117,45 @@ class _CardExampleState extends State<CardExample> {
                     ),
                     const SizedBox(height: 20),
                     const Divider(color: thirdColor),
-                    _buildField('Student Name', _studentData['name'], context),
-                    _buildField('Roll No', _studentData['rollno'], context),
-                    _buildField('Phone', _studentData['phone'], context),
+                    _buildField('Student Name', _studentData['name'].toString(),
+                        context),
                     _buildField(
-                        'Parent Phone', _studentData['parentphone'], context),
-                    _buildField('Email', _studentData['email'], context),
-                    _buildField('Mentor', _studentData['mentor'], context),
+                        'Roll No', _studentData['rollno'].toString(), context),
                     _buildField(
-                        'Mentor Email', _studentData['mentoremail'], context),
-                    _buildField('Branch', _studentData['branch'], context),
-                    _buildField('Course', _studentData['course'], context),
-                    _buildField('Batch', _studentData['batch'], context),
+                        'Phone', _studentData['phone'].toString(), context),
+                    _buildField('Parent Phone',
+                        _studentData['parentphone'].toString(), context),
+                    _buildField(
+                        'Email', _studentData['email'].toString(), context),
+                    _buildField('Mentor Email',
+                        _studentData['mentoremail'].toString(), context),
+                    _buildField(
+                        'CGPA', _studentData['CGPA'].toString(), context),
+                    _buildField(
+                        'Branch', _studentData['dept'].toString(), context),
+                    _buildField(
+                        'Course', _studentData['school'].toString(), context),
+                    _buildField(
+                        'Batch', _studentData['batch'].toString(), context),
+                    _buildField('Specialization',
+                        _studentData['spec'].toString(), context),
+                    _buildField('Enrollmentstatus',
+                        _studentData['enrollmentstatus'].toString(), context),
+                    const SizedBox(height: 20),
+                    const Text('Programming Related',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black, // Text colors
+                        )),
+                    const Divider(color: thirdColor),
+                    _buildField('Leetcode', _studentData['leetcode'].toString(),
+                        context),
+                    _buildField(
+                        'Codechef', _studentData['codechef'].toString(), context),
+                    _buildField(
+                        'Hackerrank', _studentData['hackerrank'].toString(), context),
+                   
                   ],
                 ),
               ),

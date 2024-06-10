@@ -12,16 +12,12 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   List<Event> events = [
-    Event(
-      name: "Flutter Workshop",
-      date: DateTime(2024, 5, 10),
-      duration: Duration(hours: 2),
-    ),
-    Event(
-      name: "Dart Conference",
-      date: DateTime(2024, 5, 15),
-      duration: Duration(hours: 3),
-    ),
+    // Event(
+    //   name: "Flutter Workshop",
+    //   date: DateTime(2024, 5, 10),
+    //   duration: Duration(hours: 2),
+    // ),
+   
     // Add more events here
   ];
 
@@ -33,30 +29,81 @@ class _EventPageState extends State<EventPage> {
         backgroundColor: mainColor,
       ),
       body: ListView.builder(
-        itemCount: events.length,
+        itemCount: events.length + 1, // +1 for the info card
         itemBuilder: (context, index) {
-          return Card(
-            elevation: 4.0,
-            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            color: secondaryColor,
-            child: ListTile(
-              title: Text(
-                events[index].name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: fourthColor,
-                ),
-              ),
-              subtitle: Text(
-                'Starts: ${events[index].date.toString()}\nDuration: ${events[index].duration.inHours} hours',
+          if (index == 0) {
+            return CardView(
+              title: 'Upcoming Events Information',
+              content: Text(
+                'This page contains all the upcoming meetings, alumni meetings, and other events. Below are the details of each event.',
                 style: TextStyle(color: thirdColor),
               ),
-              onTap: () {
-                // Define what happens when an event is tapped
-              },
-            ),
-          );
+              color: secondaryColor,
+            );
+          } else {
+            final event = events[index - 1]; // Adjust index for the event list
+            return Card(
+              elevation: 4.0,
+              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              color: secondaryColor,
+              child: ListTile(
+                title: Text(
+                  event.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: fourthColor,
+                  ),
+                ),
+                subtitle: Text(
+                  'Starts: ${event.date.toString()}\nDuration: ${event.duration.inHours} hours',
+                  style: TextStyle(color: thirdColor),
+                ),
+                onTap: () {
+                  // Define what happens when an event is tapped
+                },
+              ),
+            );
+          }
         },
+      ),
+    );
+  }
+}
+
+class CardView extends StatelessWidget {
+  final String title;
+  final Widget content;
+  final Color color;
+
+  const CardView({
+    required this.title,
+    required this.content,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: color,
+      elevation: 4.0,
+      margin: EdgeInsets.all(16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: fourthColor,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            content,
+          ],
+        ),
       ),
     );
   }

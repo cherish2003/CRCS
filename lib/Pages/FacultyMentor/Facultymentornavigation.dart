@@ -2,7 +2,6 @@ import 'package:crcs/Pages/student_page/Attendance/Attendance.dart';
 import 'package:crcs/Pages/student_page/Events.dart';
 import 'package:crcs/Pages/student_page/Studentinfo.dart';
 import 'package:crcs/Pages/student_page/mypratice.dart';
-import 'package:crcs/Pages/student_page/performance.dart';
 import 'package:flutter/material.dart';
 import 'package:crcs/Pages/student_page/CompanyFeedback.dart';
 import 'package:crcs/Pages/student_page/PlacementPolicy.dart';
@@ -70,11 +69,11 @@ class Facultymentornavigation extends StatelessWidget {
             ListTile(
               title: const Text('Attendance'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AttendancePage()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => const AttendancePage()),
+                // );
               },
               hoverColor: thirdColor.withOpacity(0.5),
             ),
@@ -104,16 +103,6 @@ class Facultymentornavigation extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const CardExample()),
-                );
-              },
-              hoverColor: thirdColor.withOpacity(0.5),
-            ),
-            ListTile(
-              title: const Text('My Performance'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PerformanceScreen()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
@@ -156,7 +145,7 @@ class Facultymentornavigation extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  ContactUs()),
+                  MaterialPageRoute(builder: (context) => ContactUs()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),

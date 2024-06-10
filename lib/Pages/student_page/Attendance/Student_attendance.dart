@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:crcs/Pages/student_page/Attendance/StudAttQrscanner.dart';
+
 import 'package:crcs/Pages/student_page/Attendance/check_in_service.dart';
 import 'package:crcs/components/checkmark.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,6 @@ class StudentAttendancePage extends StatefulWidget {
 class _StudentAttendancePageState extends State<StudentAttendancePage> {
   int flag = 0;
 
-// getInstance() returns an instance for the current platform.
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +39,16 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                    Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CheckInWidget()));
+                      Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CheckInWidget()));
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: mainColor,
                       minimumSize: const Size(100, 60),
-                      maximumSize: const Size(150, 60),
+                      maximumSize: const Size(180, 120),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32.0),
                       ),
@@ -55,24 +56,25 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.location_on,
-                            size: 22, color: Colors.white),
-                        Text("Location", style: TextStyle(fontSize: 16)),
+                        Icon(Icons.meeting_room, size: 25, color: Colors.white),
+                        const SizedBox(height:10),
+                        Text("Auditorium", style: TextStyle(fontSize: 16)),
                       ],
                     ),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        flag = 0;
-                      });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => QRScannerScreen()));
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: mainColor,
                       minimumSize: const Size(100, 60),
-                      maximumSize: const Size(150, 60),
+                      maximumSize: const Size(180, 120),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32.0),
                       ),
@@ -128,7 +130,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                 ),
               )
             else if (flag == 2)
-             Center(
+              Center(
                 child: Column(
                   children: [
                     const CheckMarkPage(),

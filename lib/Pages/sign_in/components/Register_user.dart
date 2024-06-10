@@ -1,22 +1,49 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:crcs/Pages/FacultyCoor/FacultyCoorNavig.dart';
 import 'package:crcs/Pages/FacultyMentor/Facultymentornavigation.dart';
 import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
-import 'package:crcs/Pages/student_page/StudentNavigationPage.dart';
 import 'package:crcs/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:crcs/config.dart';
 import 'package:http/http.dart' as http;
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:math';
+
+String generateRandomIV() {
+  final random = Random.secure();
+  final ivBytes = List<int>.generate(16, (_) => random.nextInt(256));
+  return String.fromCharCodes(ivBytes);
+}
 
 class RegisterUser extends StatefulWidget {
   const RegisterUser({Key? key}) : super(key: key);
 
   @override
   State<RegisterUser> createState() => _RegisterUserState();
+}
+
+Future<String> encryptDeviceInfo(String deviceInfo) async {
+  final storage = FlutterSecureStorage();
+  final key = await storage.read(key: 'SRMAP_APP');
+  final iv = await storage.read(key: 'iv');
+
+  if (key == null || iv == null) {
+    throw Exception('Key or IV not found');
+  }
+
+  final keyBytes = encrypt.Key.fromUtf8(key);
+  final ivBytes = encrypt.IV.fromUtf8(iv);
+  final encrypter =
+      encrypt.Encrypter(encrypt.AES(keyBytes, mode: encrypt.AESMode.cbc));
+
+  final encrypted = encrypter.encrypt(deviceInfo, iv: ivBytes);
+  return encrypted.base64;
 }
 
 class _RegisterUserState extends State<RegisterUser> {
@@ -38,6 +65,7 @@ class _RegisterUserState extends State<RegisterUser> {
       loadingState = true; // Set loading state to true when registration starts
       errorMessage = null; // Clear any previous error messages
     });
+
     // Retrieve input field data
     Map<String, dynamic> formData = {};
     for (var formValue in FormValues) {
@@ -46,6 +74,7 @@ class _RegisterUserState extends State<RegisterUser> {
         formData[label] = controllers[label]!.text;
       }
     }
+
     String selectedRoleLabel = "";
     for (var role in Roles) {
       if (role['id'] == int.parse(userRole!)) {
@@ -54,55 +83,88 @@ class _RegisterUserState extends State<RegisterUser> {
       }
     }
     print("Selected Role: $selectedRoleLabel");
-    // Get device information
+
+    // Encrypt device info
     final info = await getDeviceInfo();
-    setState(() {
-      deviceInfo = info;
-    });
+    final encryptedDeviceInfo = await encryptDeviceInfo(jsonEncode(info));
+    print('Encrypted Device Info: $encryptedDeviceInfo');
 
     var regBody = {
       "UserRole": selectedRoleLabel,
       "InputInfo": formData,
-      "deviceInfo": deviceInfo
+      "encryptedDeviceInfo": encryptedDeviceInfo
     };
 
     try {
-      var response = await http.post(Uri.parse(register),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(regBody));
+      var response = await http.post(
+        Uri.parse(register),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(regBody),
+      );
 
       var responseData = jsonDecode(response.body);
+      print("Response Data: $responseData");
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      if (responseData['success']) {
-        var token = responseData['token'];
-        if (selectedRoleLabel == "Student") {
-          var rollno = responseData['userData']['rollno'];
-          var batch = responseData['userData']['batch'];
-          prefs.setString("Token", token);
-          prefs.setString("Rollno", rollno);
-          prefs.setString("Batch", batch);
-          print(token);
+      if (responseData['success'] == true) {
+        var userData = responseData['userData'];
 
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => StudentNavigationPage()));
+        if (userData != null) {
+          var token = responseData['token'];
+          print("Token: $token");
+
+          if (selectedRoleLabel == "Student") {
+            var rollno = userData['rollno'];
+            var batch = userData['yearofpassing'];
+            print("Rollno: $rollno");
+            print("Batch: $batch");
+
+            // Ensure token, rollno, and batch are not null before saving
+            if (token != null) {
+              prefs.setString("Token", token);
+            } else {
+              print("Token is null");
+            }
+            if (rollno != null) {
+              prefs.setString("Rollno", rollno);
+            } else {
+              print("Rollno is null");
+            }
+            if (batch != null) {
+              prefs.setString("Batch", batch);
+            } else {
+              print("Batch is null");
+            }
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => StudentHomepage()),
+            );
+          } else if (selectedRoleLabel == "Faculty coordinator") {
+            print("User Data: $userData");
+
+            if (token != null) {
+              prefs.setString("Token", token);
+            } else {
+              print("Token is null");
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => FacultyCoorNavig()),
+            );
+          }
+        } else {
+          print("User data is null");
         }
-        if (selectedRoleLabel == "Faculty mentor") {
-          prefs.setString("Token", token);
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Facultymentornavigation()));
-        }
-        prefs.setString("Token", token);
-        //to navigate 
       } else {
         setState(() {
           errorMessage = responseData['error'];
         });
       }
-    } catch (e) {
+    } catch (error) {
+      print("Error: $error");
       setState(() {
-        errorMessage =
-            "Failed to register. Please try again later."; // Display a generic error message
+        errorMessage = "An error occurred. Please try again.";
       });
     } finally {
       setState(() {
@@ -110,7 +172,6 @@ class _RegisterUserState extends State<RegisterUser> {
             false; // Set loading state to false when registration completes
       });
     }
-    // print(response.body);
   }
 
   late Map<String, TextEditingController> controllers;

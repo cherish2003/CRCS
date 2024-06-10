@@ -1,4 +1,13 @@
 import 'dart:convert';
+import 'package:crcs/Pages/student_page/Attendance/Attendance.dart';
+import 'package:crcs/Pages/student_page/CompanyFeedback.dart';
+import 'package:crcs/Pages/student_page/Contactus.dart';
+import 'package:crcs/Pages/student_page/Events.dart';
+import 'package:crcs/Pages/student_page/PlacementPolicy.dart';
+import 'package:crcs/Pages/student_page/StudCompanies.dart';
+import 'package:crcs/Pages/student_page/StudentFeedback.dart';
+import 'package:crcs/Pages/student_page/Studentinfo.dart';
+import 'package:crcs/Pages/student_page/mypratice.dart';
 import 'package:crcs/config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -42,7 +51,6 @@ class _StudentHomepageState extends State<StudentHomepage> {
   }
 
   Future<void> fetchPlacementProgress() async {
-    print(_token);
     try {
       final response = await http.post(
         Uri.parse('$getStudProgress/$_batch'),
@@ -57,9 +65,11 @@ class _StudentHomepageState extends State<StudentHomepage> {
 
       if (response.statusCode == 200) {
         final res = jsonDecode(response.body);
+
         _jsonData = res['data'];
-        // Process the response data here
+        print(_jsonData);
         print(_jsonData['appliedCompany'][_rollno].length);
+        // Process the response data here
       } else {
         // Handle error response
         print('Request failed with status: ${response.statusCode}');
@@ -71,17 +81,58 @@ class _StudentHomepageState extends State<StudentHomepage> {
   }
 
   void _calculateCounts() {
-    _counts['appliedCompany'] = _jsonData['appliedCompany'][_rollno].length;
-    _counts['eligibleCompany'] = _jsonData['eligibleCompany'][_rollno].length;
-    _counts['placed'] = _jsonData['placed'][_rollno].length;
-    _counts['shortlistedCompany'] =
-        _jsonData['shortlistedCompany'][_rollno].length;
-    _counts['placed'] = _jsonData['placed'][_rollno].length;
-    _counts['gd'] = _jsonData['stages'][_rollno]['gd'].length;
-    _counts['hr'] = _jsonData['stages'][_rollno]['hr'].length;
-    _counts['inter'] = _jsonData['stages'][_rollno]['inter'].length;
-    _counts['ot'] = _jsonData['stages'][_rollno]['ot'].length;
-    _counts['other'] = _jsonData['stages'][_rollno]['other'].length;
+    // Initialize counts with default values
+    _counts = {
+      'appliedCompany': 0,
+      'eligibleCompany': 0,
+      'placed': 0,
+      'shortlistedCompany': 0,
+      'gd': 0,
+      'hr': 0,
+      'ot': 0,
+      'other': 0,
+      'inter': 0,
+    };
+
+    if (_jsonData != null) {
+      if (_jsonData.containsKey('eligibleCompany') &&
+          _jsonData['eligibleCompany'].containsKey(_rollno)) {
+        _counts['eligibleCompany'] =
+            _jsonData['eligibleCompany'][_rollno]?.length ?? 0;
+      }
+
+      if (_jsonData.containsKey('appliedCompany') &&
+          _jsonData['appliedCompany'].containsKey(_rollno)) {
+        _counts['appliedCompany'] =
+            _jsonData['appliedCompany'][_rollno]?.length ?? 0;
+      }
+
+      if (_jsonData.containsKey('placed') &&
+          _jsonData['placed'].containsKey(_rollno)) {
+        _counts['placed'] = _jsonData['placed'][_rollno]?.length ?? 0;
+      }
+
+      if (_jsonData.containsKey('shortlistedCompany') &&
+          _jsonData['shortlistedCompany'].containsKey(_rollno)) {
+        _counts['shortlistedCompany'] =
+            _jsonData['shortlistedCompany'][_rollno]?.length ?? 0;
+      }
+
+      if (_jsonData.containsKey('stages') &&
+          _jsonData['stages'].containsKey(_rollno)) {
+        final stages = _jsonData['stages'][_rollno];
+
+        _counts['gd'] = stages['gd']?.length ?? 0;
+        _counts['hr'] = stages['hr']?.length ?? 0;
+        _counts['ot'] = stages['ot']?.length ?? 0;
+        _counts['other'] = stages['other']?.length ?? 0;
+
+        _counts['inter'] = (stages['inter1']?.length ?? 0) +
+            (stages['inter2']?.length ?? 0) +
+            (stages['inter3']?.length ?? 0);
+      }
+    }
+
     setState(() {});
   }
 
@@ -89,8 +140,143 @@ class _StudentHomepageState extends State<StudentHomepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
-        backgroundColor: mainColor,
+          title: const Text('Home Page'),
+          backgroundColor: mainColor,
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            },
+          )),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            Container(
+              height: 100,
+              // Adjust the height as needed
+              decoration: const BoxDecoration(
+                color: mainColor,
+              ),
+              child: Center(
+                child: Image.asset(
+                  'images/BLogo.png', // Replace 'your_image.png' with your image asset path
+                  width: 70,
+                  height: 70, // Adjust width as needed
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const StudentHomepage()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Attendance'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Attendance()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Events'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EventPage()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Practice'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPracticeScreen()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Info'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CardExample()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Mentor Feedback'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const FeedbackScreen()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            // ListTile(
+            //   title: const Text('Company Feedback'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) => const CompanyFeedback()),
+            //     );
+            //   },
+            //   hoverColor: thirdColor.withOpacity(0.5),
+            // ),
+            ListTile(
+              title: const Text('Companies'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Studcompanies()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Placement Policy'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ContactAndSupportScreen()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Contact us'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ContactUs()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+          ],
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -143,7 +329,7 @@ class _StudentHomepageState extends State<StudentHomepage> {
                     companyName: 'Eligible Companies',
                     count: _counts['eligibleCompany'],
                   ),
-                   Divider(),
+                  Divider(),
                   CompanyTile(
                     companyName: 'Online test',
                     count: _counts['ot'],
@@ -157,7 +343,7 @@ class _StudentHomepageState extends State<StudentHomepage> {
                       color: fourthColor,
                     ),
                   ),
-                  
+
                   CompanyTile(
                     companyName: 'GD',
                     count: _counts['gd'],

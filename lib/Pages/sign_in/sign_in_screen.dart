@@ -1,10 +1,125 @@
+import 'dart:convert';
+
+import 'package:crcs/Pages/FacultyCoor/FacultyCoorNavig.dart';
+import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
+import 'package:crcs/Pages/student_page/StudentHomepage.dart';
+import 'package:crcs/config.dart';
 import 'package:flutter/material.dart';
 import 'package:crcs/Pages/sign_in/components/Register_user.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
+  @override
+  _SignInScreenState createState() => _SignInScreenState();
+}
 
+class _SignInScreenState extends State<SignInScreen> {
+  bool _isLoading = false;
+
+  String? errorMessage;
+  String? successMessage;
+
+  Future<String> encryptDeviceInfo(String deviceInfo) async {
+    final storage = const FlutterSecureStorage();
+    final key = await storage.read(key: 'SRMAP_APP');
+    final iv = await storage.read(key: 'iv');
+
+    if (key == null || iv == null) {
+      throw Exception('Key or IV not found');
+    }
+
+    final keyBytes = encrypt.Key.fromUtf8(key);
+    final ivBytes = encrypt.IV.fromUtf8(iv);
+    final encrypter =
+        encrypt.Encrypter(encrypt.AES(keyBytes, mode: encrypt.AESMode.cbc));
+
+    final encrypted = encrypter.encrypt(deviceInfo, iv: ivBytes);
+    return encrypted.base64;
+  }
+
+  Future<void> fetchData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final info = await getDeviceInfo();
+    final encryptedDeviceInfo = await encryptDeviceInfo(jsonEncode(info));
+
+    var response = await http.post(
+      Uri.parse(login),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'encryptedDeviceInfo': encryptedDeviceInfo}),
+    );
+    var responseData = jsonDecode(response.body);
+    print(responseData);
+
+    if (response.statusCode == 200) {
+      if (responseData['role'] == "student") {
+        var token = responseData['token'];
+        var rollno = responseData['userData']['rollno'];
+        var batch = responseData['userData']['yearofpassing'];
+        print("Rollno: $rollno");
+        print("Batch: $batch");
+        if (token != null) {
+          prefs.setString("Token", token);
+        } else {
+          print("Token is null");
+        }
+        if (rollno != null) {
+          prefs.setString("Rollno", rollno);
+        } else {
+          print("Rollno is null");
+        }
+        if (batch != null) {
+          prefs.setString("Batch", batch);
+        } else {
+          print("Batch is null");
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => StudentHomepage()),
+        );
+      } else if (responseData['role'] == 'coor') {
+        var token = responseData['token'];
+        if (token != null) {
+          prefs.setString("Token", token);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => FacultyCoorNavig()),
+          );
+        } else {
+          print("Token is null");
+        }
+      }
+    } else if (response.statusCode == 404) {
+      setState(() {
+        errorMessage = responseData['error'];
+      });
+    } else {
+      setState(() {
+        errorMessage = "Login failed !!!";
+      });
+      print("Login failed");
+    }
+  }
+
+  void _handleLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await fetchData();
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +138,7 @@ class SignInScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Welcome ",
+                  "Welcome",
                   style: TextStyle(
                       color: thirdColor,
                       fontSize: 34,
@@ -70,17 +185,37 @@ class SignInScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 20), // Space between buttons
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(140, 60),
                         backgroundColor: thirdColor,
                         foregroundColor: secondaryColor,
                       ),
-                      icon: const Icon(Icons.login_sharp),
-                      label: const Text("Login"),
+                      icon: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: secondaryColor,
+                              ),
+                            )
+                          : const Icon(Icons.login_sharp),
+                      label: _isLoading
+                          ? const SizedBox.shrink() // Hide label while loading
+                          : const Text("Login"),
                     ),
                   ],
                 ),
+                const SizedBox(height: 35),
+                if (errorMessage != null)
+                  Center(
+                    child: Text(
+                      errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  )
               ],
             ),
           ),
