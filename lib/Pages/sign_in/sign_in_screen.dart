@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crcs/Pages/FacultyCoor/FacultyCoorNavig.dart';
 import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'package:flutter/material.dart';
 import 'package:crcs/Pages/sign_in/components/Register_user.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -53,7 +53,7 @@ class _SignInScreenState extends State<SignInScreen> {
       body: jsonEncode({'encryptedDeviceInfo': encryptedDeviceInfo}),
     );
     var responseData = jsonDecode(response.body);
-    print(responseData);
+    print(response);
 
     if (response.statusCode == 200) {
       if (responseData['role'] == "student") {

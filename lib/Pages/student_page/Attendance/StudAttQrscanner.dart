@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
 import 'package:crcs/components/checkmark.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';

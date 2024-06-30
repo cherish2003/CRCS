@@ -2,7 +2,7 @@ import 'package:crcs/Pages/FacultyCoor/FacultyCoorSessions.dart';
 import 'package:crcs/Pages/student_page/Attendance/Attendance.dart';
 import 'package:crcs/Pages/student_page/CompanyFeedback.dart';
 import 'package:crcs/Pages/student_page/Contactus.dart';
-import 'package:crcs/Pages/student_page/Events.dart';
+import 'package:crcs/Pages/student_page/Announcements.dart';
 import 'package:crcs/Pages/student_page/PlacementPolicy.dart';
 import 'package:crcs/Pages/student_page/StudentFeedback.dart';
 import 'package:crcs/Pages/student_page/Studentinfo.dart';

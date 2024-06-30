@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 const Color mainColor = Color(0xff6a6446);
 const Color secondaryColor = Color(0xfff2f0e4);
 const Color thirdColor = Color(0xff403a1f);
 const Color fourthColor = Color(0xffbf7d2c);
 
-class EventPage extends StatefulWidget {
+class Announcements extends StatefulWidget {
   @override
-  _EventPageState createState() => _EventPageState();
+  _AnnouncementsState createState() => _AnnouncementsState();
 }
 
-class _EventPageState extends State<EventPage> {
+class _AnnouncementsState extends State<Announcements> {
   List<Event> events = [
     // Event(
     //   name: "Flutter Workshop",
     //   date: DateTime(2024, 5, 10),
     //   duration: Duration(hours: 2),
     // ),
-   
+
     // Add more events here
   ];
+
+  @override
+  void initState() {
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
+    OneSignal.initialize("a6e44ad7-41e9-4eac-96bb-2470d434f211");
+    OneSignal.Notifications.requestPermission(true).then((value) {
+      print("signal value ${value}");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upcoming Events'),
+        title: Text('Announcements'),
         backgroundColor: mainColor,
       ),
       body: ListView.builder(
@@ -33,9 +43,9 @@ class _EventPageState extends State<EventPage> {
         itemBuilder: (context, index) {
           if (index == 0) {
             return CardView(
-              title: 'Upcoming Events Information',
+              title: 'Upcoming Announcements Information',
               content: Text(
-                'This page contains all the upcoming meetings, alumni meetings, and other events. Below are the details of each event.',
+                'This page contains all the announcements  about upcoming meetings, alumni meetings, and other events.',
                 style: TextStyle(color: thirdColor),
               ),
               color: secondaryColor,
@@ -118,7 +128,7 @@ class Event {
 }
 
 void main() => runApp(MaterialApp(
-      home: EventPage(),
+      home: Announcements(),
       theme: ThemeData(
         primaryColor: mainColor,
       ),

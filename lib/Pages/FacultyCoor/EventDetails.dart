@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:crcs/Pages/FacultyCoor/Attendance%20/FacultyQrGen.dart';
 import 'package:crcs/Pages/FacultyCoor/Attendance%20/FacultyQrScanner.dart';
 import 'package:flutter/material.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'FacultyCoorSessions.dart';
 import 'package:crcs/Pages/student_page/Attendance/check_in_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';

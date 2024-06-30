@@ -16,7 +16,6 @@ class StudentAttendancePage extends StatefulWidget {
 class _StudentAttendancePageState extends State<StudentAttendancePage> {
   int flag = 0;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,9 +39,9 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CheckInWidget()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CheckInWidget()));
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -56,9 +55,9 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.meeting_room, size: 25, color: Colors.white),
-                        const SizedBox(height:10),
-                        Text("Auditorium", style: TextStyle(fontSize: 16)),
+                        Icon(Icons.person, size: 25, color: Colors.white),
+                        const SizedBox(height: 10),
+                        Text("Your QR", style: TextStyle(fontSize: 16)),
                       ],
                     ),
                   ),
@@ -85,7 +84,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                         Icon(Icons.qr_code_scanner_rounded,
                             size: 26, color: Colors.white),
                         const SizedBox(width: 10),
-                        Text("QR", style: TextStyle(fontSize: 18)),
+                        Text("Scanner", style: TextStyle(fontSize: 18)),
                       ],
                     ),
                   ),

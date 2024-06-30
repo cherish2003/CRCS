@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 
 class FacultyQrgen extends StatefulWidget {
   final String eventId;

@@ -1,6 +1,3 @@
-import 'package:crcs/Pages/student_page/StudCompanies.dart';
-import 'package:flutter/material.dart';
-
 import 'package:flutter/material.dart';
 import 'package:crcs/Pages/student_page/StudCompanies.dart';
 
@@ -71,10 +68,11 @@ class Studcompanydetails extends StatelessWidget {
             ),
             SizedBox(height: 16),
             // Status Chips
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            CardView(
+              title: 'Status',
+              content: Wrap(
+                spacing: 10.0,
+                runSpacing: 10.0,
                 children: [
                   if (isShortlisted)
                     Chip(
@@ -83,7 +81,6 @@ class Studcompanydetails extends StatelessWidget {
                           style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.blue,
                     ),
-                  SizedBox(width: 10),
                   if (isPlaced)
                     Chip(
                       avatar: Icon(Icons.done_all, color: Colors.white),
@@ -91,7 +88,6 @@ class Studcompanydetails extends StatelessWidget {
                           Text('Placed', style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.green,
                     ),
-                  SizedBox(width: 10),
                   if (isApplied)
                     Chip(
                       avatar: Icon(Icons.event_available, color: Colors.white),
@@ -99,7 +95,6 @@ class Studcompanydetails extends StatelessWidget {
                           style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.orange,
                     ),
-                  SizedBox(width: 10),
                   if (isEligible)
                     Chip(
                       avatar: Icon(Icons.star, color: Colors.white),
@@ -107,8 +102,17 @@ class Studcompanydetails extends StatelessWidget {
                           style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.purple,
                     ),
+                  if (!isShortlisted && !isPlaced && !isApplied && !isEligible)
+                    Chip(
+                      avatar: Icon(Icons.not_interested_outlined,
+                          color: Colors.white),
+                      label: Text('Not applied',
+                          style: TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.red,
+                    )
                 ],
               ),
+              color: secondaryColor,
             ),
           ],
         ),
@@ -126,7 +130,8 @@ class CardView extends StatelessWidget {
     required this.title,
     required this.content,
     required this.color,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

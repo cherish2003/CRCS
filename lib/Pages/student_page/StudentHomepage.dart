@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:crcs/Pages/student_page/Attendance/Attendance.dart';
 import 'package:crcs/Pages/student_page/CompanyFeedback.dart';
 import 'package:crcs/Pages/student_page/Contactus.dart';
-import 'package:crcs/Pages/student_page/Events.dart';
+import 'package:crcs/Pages/student_page/Announcements.dart';
 import 'package:crcs/Pages/student_page/PlacementPolicy.dart';
 import 'package:crcs/Pages/student_page/StudCompanies.dart';
 import 'package:crcs/Pages/student_page/StudentFeedback.dart';
 import 'package:crcs/Pages/student_page/Studentinfo.dart';
 import 'package:crcs/Pages/student_page/mypratice.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
+import 'package:crcs/utils/TokenManger.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -182,21 +183,31 @@ class _StudentHomepageState extends State<StudentHomepage> {
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Attendance'),
+              title: const Text('Info'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Attendance()),
+                  MaterialPageRoute(builder: (context) => const CardExample()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Events'),
+              title: const Text('Announcements'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EventPage()),
+                  MaterialPageRoute(builder: (context) => Announcements()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Attendance'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Attendance()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
@@ -212,11 +223,23 @@ class _StudentHomepageState extends State<StudentHomepage> {
               hoverColor: thirdColor.withOpacity(0.5),
             ),
             ListTile(
-              title: const Text('Info'),
+              title: const Text('Companies'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CardExample()),
+                  MaterialPageRoute(
+                      builder: (context) => const Studcompanies()),
+                );
+              },
+              hoverColor: thirdColor.withOpacity(0.5),
+            ),
+            ListTile(
+              title: const Text('Company Feedback'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CompanyFeedback()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),
@@ -228,28 +251,6 @@ class _StudentHomepageState extends State<StudentHomepage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const FeedbackScreen()),
-                );
-              },
-              hoverColor: thirdColor.withOpacity(0.5),
-            ),
-            // ListTile(
-            //   title: const Text('Company Feedback'),
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //           builder: (context) => const CompanyFeedback()),
-            //     );
-            //   },
-            //   hoverColor: thirdColor.withOpacity(0.5),
-            // ),
-            ListTile(
-              title: const Text('Companies'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const Studcompanies()),
                 );
               },
               hoverColor: thirdColor.withOpacity(0.5),

@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: mainColor,
         title: const Text("CRCS"),
+        
       ),
       // ignore: avoid_unnecessary_containers
       body: Container(

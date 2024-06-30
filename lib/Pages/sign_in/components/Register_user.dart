@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:crcs/Pages/FacultyCoor/FacultyCoorNavig.dart';
-import 'package:crcs/Pages/FacultyMentor/Facultymentornavigation.dart';
 import 'package:crcs/Pages/sign_in/components/Get_deviceinfo.dart';
 import 'package:crcs/Pages/student_page/StudentHomepage.dart';
 import 'package:crcs/constants.dart';
+import 'package:crcs/utils/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'package:http/http.dart' as http;
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -50,23 +51,70 @@ class _RegisterUserState extends State<RegisterUser> {
   String? userRole;
   String? stateId;
 
-  final _formKey = GlobalKey<FormState>(); // Add form key
-
+  final _formKey = GlobalKey<FormState>();
   List<dynamic> Roles = [];
   List<dynamic> FormValues = [];
   List<dynamic> states = [];
   Map<String, dynamic>? deviceInfo;
   String? errorMessage;
   String? sucessMessage;
+  String? Studentemail;
+  String? StudentrollNumber;
   bool loadingState = false;
+  bool googleloadingState = false;
+  bool isGoogleAuthDone = false;
+
+  Future<void> signInwithGoogle() async {
+    final user = await GoogleSignInApi.login();
+    print(user);
+
+    if (user != null) {
+      String? displayName = user.displayName;
+      String? email = user.email;
+
+      String? rollNumber;
+      if (displayName != null) {
+        rollNumber = RegExp(r'AP\d{11}').stringMatch(displayName);
+      }
+
+      if (email == null ||
+          !RegExp(r'^[a-zA-Z0-9._%+-]+@srmap\.edu\.in$').hasMatch(email)) {
+        setState(() {
+          errorMessage = 'Collega mail is required for registration !!!';
+        });
+        await GoogleSignInApi.logout();
+        return;
+      }
+
+      if (rollNumber == null || !RegExp(r'^AP\d{11}$').hasMatch(rollNumber)) {
+        setState(() {
+          errorMessage = 'Invalid format. Format should be like APXXXXXXXXXXX';
+        });
+        await GoogleSignInApi.logout();
+        return;
+      }
+
+      setState(() {
+        Studentemail = email;
+        StudentrollNumber = rollNumber;
+        isGoogleAuthDone = true;
+        errorMessage = null;
+      });
+    }
+  }
 
   Future signinClick() async {
+    if (userRole == '1' && !isGoogleAuthDone) {
+      setState(() {
+        errorMessage = "Registration with google must be done first !!";
+      });
+      return;
+    }
     setState(() {
-      loadingState = true; // Set loading state to true when registration starts
-      errorMessage = null; // Clear any previous error messages
+      loadingState = true;
+      errorMessage = null;
     });
 
-    // Retrieve input field data
     Map<String, dynamic> formData = {};
     for (var formValue in FormValues) {
       String label = formValue['label'];
@@ -84,14 +132,17 @@ class _RegisterUserState extends State<RegisterUser> {
     }
     print("Selected Role: $selectedRoleLabel");
 
-    // Encrypt device info
     final info = await getDeviceInfo();
     final encryptedDeviceInfo = await encryptDeviceInfo(jsonEncode(info));
     print('Encrypted Device Info: $encryptedDeviceInfo');
 
+    Map<String, dynamic> StudentData = {
+      "Student Roll number": StudentrollNumber,
+      "College mail": Studentemail,
+    };
     var regBody = {
       "UserRole": selectedRoleLabel,
-      "InputInfo": formData,
+      "InputInfo": selectedRoleLabel == "Student" ? StudentData : formData,
       "encryptedDeviceInfo": encryptedDeviceInfo
     };
 
@@ -168,8 +219,7 @@ class _RegisterUserState extends State<RegisterUser> {
       });
     } finally {
       setState(() {
-        loadingState =
-            false; // Set loading state to false when registration completes
+        loadingState = false;
       });
     }
   }
@@ -185,11 +235,7 @@ class _RegisterUserState extends State<RegisterUser> {
       {"id": 3, "label": 'Faculty mentor'},
       {"id": 4, "label": 'Faculty coordinator'},
     ];
-
     FormValues = [
-      {"id": 1, "label": "Student full name", "ParentId": 1},
-      {"id": 2, "label": "College mail", "ParentId": 1},
-      {"id": 3, "label": "Student Roll number", "ParentId": 1},
       {"id": 1, "label": "Parent full name", "ParentId": 2},
       {"id": 2, "label": "Student full name", "ParentId": 2},
       {"id": 3, "label": "Student Roll number", "ParentId": 2},
@@ -262,6 +308,68 @@ class _RegisterUserState extends State<RegisterUser> {
                 ),
                 const SizedBox(width: 20, height: 20),
                 if (userRole != null) ...getFormFieldsForRole(userRole!),
+                if (userRole == '1')
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(250, 50), // Button size
+                      side: isGoogleAuthDone
+                          ? BorderSide(color: Colors.green)
+                          : BorderSide(color: secondaryColor), // Border color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
+                    ),
+                    onPressed: isGoogleAuthDone || googleloadingState
+                        ? null
+                        : () {
+                            setState(() {
+                              googleloadingState = true;
+                            });
+                            signInwithGoogle().then((_) {
+                              setState(() {
+                                googleloadingState = false;
+                              });
+                            });
+                          },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (googleloadingState)
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: mainColor,
+                            ),
+                          )
+                        else if (isGoogleAuthDone)
+                          Icon(Icons.check, color: Colors.green)
+                        else
+                          Image.asset(
+                            'images/google_sign.png', // Ensure you have the Google logo asset in your assets folder
+                            height: 24.0,
+                          ),
+                        SizedBox(width: 10),
+                        Text(
+                          isGoogleAuthDone
+                              ? 'Successfully registered with Google'
+                              : 'Register with Google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                isGoogleAuthDone ? Colors.green : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(width: 20, height: 10),
+                if (userRole == '1')
+                  const Text(
+                    "Note : \n 1. Students are required to register with Google first.\n 2. After successfully registration, they need to click on Continue to complete the registration process.",
+                    style: TextStyle(color: Colors.black),
+                  ),
                 const SizedBox(width: 20, height: 10),
                 const Text(
                   "Note : Your device info will be captured once you are registered it cannot be undone !! ",
@@ -270,7 +378,7 @@ class _RegisterUserState extends State<RegisterUser> {
                 const SizedBox(width: 20, height: 20),
                 ElevatedButton.icon(
                   onPressed: loadingState
-                      ? null // Disable button while loading
+                      ? null
                       : () async {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
@@ -284,7 +392,6 @@ class _RegisterUserState extends State<RegisterUser> {
                   ),
                   icon: loadingState
                       ? SizedBox(
-                          // Display loading indicator if loading
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
@@ -298,12 +405,14 @@ class _RegisterUserState extends State<RegisterUser> {
                 ),
                 const SizedBox(height: 40),
                 if (errorMessage != null)
-                  Text(
-                    errorMessage!,
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text(
+                      errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    )
+                  ]),
                 const SizedBox(),
               ],
             ),
@@ -314,69 +423,45 @@ class _RegisterUserState extends State<RegisterUser> {
   }
 
   List<Widget> getFormFieldsForRole(String role) {
-    List<Widget> formFields = [];
-
-    for (var formValue in FormValues) {
-      if (formValue['ParentId'] == int.parse(role)) {
-        formFields.add(
-          Padding(
-            padding:
-                EdgeInsets.symmetric(vertical: 16), // Add space between fields
-            child: TextFormField(
-              controller: controllers[formValue['label']],
-              decoration: InputDecoration(
-                labelText: formValue['label'],
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: mainColor, // Specify border color
-                    width: 10.0, // Specify border width
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Specify border radius
-                ),
-                labelStyle: TextStyle(color: thirdColor, fontSize: 18),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: thirdColor, width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: mainColor, width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Specify margin
-                ),
+    return FormValues.where(
+            (formValue) => formValue['ParentId'] == int.parse(role))
+        .map((formValue) {
+      String label = formValue['label'];
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: TextFormField(
+          controller: controllers[label],
+          decoration: InputDecoration(
+            labelText: formValue['label'],
+            border: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: mainColor, // Specify border color
+                width: 10.0, // Specify border width
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Input required !!!';
-                }
-                if ((formValue['label'] == 'Student full name' ||
-                        formValue['label'] == 'Parent full name' ||
-                        formValue['label'] == 'Faculty mentor name' ||
-                        formValue['label'] == 'Faculty coordinator name') &&
-                    !isValidName(value)) {
-                  return "Name should contain only alphabets !!";
-                }
-                if (formValue['label'] == 'Student Roll number') {
-                  if (!RegExp(r'^AP\d{11}$').hasMatch(value)) {
-                    return 'Invalid format. Format should be like APXXXXXXXXXXX';
-                  }
-                } else if (formValue['label'] == 'College mail') {
-                  if (!RegExp(r'^[a-zA-Z0-9._%+-]+@srmap\.edu\.in$')
-                      .hasMatch(value)) {
-                    return 'Required email format example@srmap.edu.in !!!';
-                  }
-                }
-                return null;
-              },
+              borderRadius:
+                  BorderRadius.circular(10.0), // Specify border radius
+            ),
+            labelStyle: TextStyle(color: thirdColor, fontSize: 18),
+            contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: thirdColor, width: 2.0),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: mainColor, width: 2.0),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              // Specify margin
             ),
           ),
-        );
-      }
-    }
-
-    return formFields;
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter $label';
+            }
+            return null;
+          },
+        ),
+      );
+    }).toList();
   }
 }
 

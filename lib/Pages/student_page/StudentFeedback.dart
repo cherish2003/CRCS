@@ -1,5 +1,5 @@
 import 'package:crcs/Pages/student_page/Context/student_data_context.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +15,7 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   bool _isLoading = true; // Track loading state
+  bool _isSubmitting = false; // Track submission state
 
   @override
   void initState() {
@@ -58,9 +59,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   List<String> meetingTypes = ['One-on-One', 'Group'];
 
   Future<void> submitFeedback() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+
     final studentDataContext =
         Provider.of<StudentDataContext>(context, listen: false);
     final studentData = studentDataContext.studentData;
+    // studentData['mentoremail']
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("Token");
@@ -69,38 +75,68 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Token not found. Please login again.')),
       );
+      setState(() {
+        _isSubmitting = false;
+      });
       return;
     }
-
-    final url = Uri.parse(postFeedBack);
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        "values": {
-          "mentorEmail": studentData['mentoremail'],
-          "rollno": studentData['rollno'],
-          "monthlyConnect": selectedMeetingFrequency,
-          "monthlyCount": selectedMeetingCount,
-          "meetingConnectionType": selectedConnectionType,
-          "meetingType": selectedMeetingType,
-          "studentFeedback": feedbackController.text,
-        }
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Feedback submitted successfully')),
+    if (studentData['mentoremail'] != null &&
+        studentData['rollno'] != null &&
+        selectedMeetingFrequency != null &&
+        selectedMeetingCount != null &&
+        selectedConnectionType != null &&
+        selectedMeetingType != null &&
+        feedbackController.text != null) {
+      final url = Uri.parse(postFeedBack);
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "values": {
+            "mentorEmail": studentData['mentoremail'],
+            "stuId": studentData['rollno'],
+            "monthlyConnect": selectedMeetingFrequency,
+            "monthlyCount": selectedMeetingCount,
+            "meetingConnectionType": selectedConnectionType,
+            "meetingType": selectedMeetingType,
+            "studentFeedback": feedbackController.text,
+          }
+        }),
       );
+      final parsedJson = jsonDecode(response.body);
+      if (parsedJson['success']) {
+        setState(() {
+          studentData['mentoremail'] = null;
+          studentData['rollno'] = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Feedback submitted successfully',
+                  style: TextStyle(color: Colors.green))),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to submit feedback: ${response.body}',
+                  style: TextStyle(color: Colors.red))),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit feedback: ${response.body}')),
+        SnackBar(
+            content: Text(
+          'Input fields are required !!!! ',
+          style: TextStyle(color: Colors.red),
+        )),
       );
     }
+
+    setState(() {
+      _isSubmitting = false;
+    });
   }
 
   @override
@@ -248,13 +284,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           double.infinity, // Set the width to match the parent
                       height: 50, // Set the desired height
                       child: ElevatedButton(
-                        onPressed: submitFeedback,
-                        child: const Text(
-                          'Submit Feedback',
-                          style: TextStyle(
-                            color: Colors.white, // Set the font color to white
-                          ),
-                        ),
+                        onPressed: _isSubmitting ? null : submitFeedback,
+                        child: _isSubmitting
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                'Submit Feedback',
+                                style: TextStyle(
+                                  color: Colors
+                                      .white, // Set the font color to white
+                                ),
+                              ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: mainColor,
                         ),

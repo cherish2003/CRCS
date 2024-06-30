@@ -7,21 +7,22 @@ class CompanyFeedback extends StatefulWidget {
   _CompanyFeedbackState createState() => _CompanyFeedbackState();
 }
 
-
 class _CompanyFeedbackState extends State<CompanyFeedback> {
   String? selectedCompany;
   bool? gdRound;
   String? round1Questions;
-  String? technicalRoundQuestions;
   String? hrRoundQuestions;
 
   TextEditingController feedbackController = TextEditingController();
 
   List<String> companies = ['Company A', 'Company B', 'Company C', 'Company D'];
   TextEditingController round1QuestionsController = TextEditingController();
-  TextEditingController technicalRoundQuestionsController =
-      TextEditingController();
+  TextEditingController technicalRound1Controller = TextEditingController();
+  TextEditingController technicalRound2Controller = TextEditingController();
+  TextEditingController technicalRound3Controller = TextEditingController();
   TextEditingController hrRoundQuestionsController = TextEditingController();
+
+  List<int> technicalRounds = [1]; // Initially one technical round
 
   @override
   Widget build(BuildContext context) {
@@ -133,24 +134,73 @@ class _CompanyFeedbackState extends State<CompanyFeedback> {
                 maxLines: null,
               ),
               SizedBox(height: 16.0),
-              Text(
-                'Questions for Technical Round',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: mainColor,
-                ),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-                controller: technicalRoundQuestionsController,
-                decoration: InputDecoration(
-                  labelText: 'Technical Round Questions',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: null,
-              ),
-              SizedBox(height: 16.0),
+              ...technicalRounds.map((round) {
+                TextEditingController controller;
+                String labelText;
+                switch (round) {
+                  case 1:
+                    controller = technicalRound1Controller;
+                    labelText = 'Technical Round 1 Questions';
+                    break;
+                  case 2:
+                    controller = technicalRound2Controller;
+                    labelText = 'Technical Round 2 Questions';
+                    break;
+                  case 3:
+                    controller = technicalRound3Controller;
+                    labelText = 'Technical Round 3 Questions';
+                    break;
+                  default:
+                    return Container(); // Should not reach here
+                }
+                return Column(
+                  children: [
+                    Text(
+                      'Questions for $labelText',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: mainColor,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextFormField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        labelText: labelText,
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: null,
+                    ),
+                    if (round == technicalRounds.length)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (technicalRounds.length > 1)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  technicalRounds.removeLast();
+                                });
+                              },
+                              child: Text('Remove Question'),
+                            ),
+                          if (technicalRounds.length < 3)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  technicalRounds
+                                      .add(technicalRounds.length + 1);
+                                });
+                              },
+                              child: Text('Add Question'),
+                            ),
+                        ],
+                      ),
+                    SizedBox(height: 16.0),
+                  ],
+                );
+              }).toList(),
               Text(
                 'Questions for HR Round',
                 style: TextStyle(
@@ -169,15 +219,6 @@ class _CompanyFeedbackState extends State<CompanyFeedback> {
                 maxLines: null,
               ),
               SizedBox(height: 16.0),
-              TextFormField(
-                controller: feedbackController,
-                decoration: InputDecoration(
-                  labelText: 'Enter Feedback',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 5,
-              ),
-              SizedBox(height: 16.0),
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -188,17 +229,29 @@ class _CompanyFeedbackState extends State<CompanyFeedback> {
                     print('GD Round: $gdRound');
                     print('Round 1 Questions: $round1Questions');
                     print(
-                        'Technical Round Questions: $technicalRoundQuestions');
+                        'Technical Round 1 Questions: ${technicalRound1Controller.text}');
+                    if (technicalRounds.length > 1) {
+                      print(
+                          'Technical Round 2 Questions: ${technicalRound2Controller.text}');
+                    }
+                    if (technicalRounds.length > 2) {
+                      print(
+                          'Technical Round 3 Questions: ${technicalRound3Controller.text}');
+                    }
                     print('HR Round Questions: $hrRoundQuestions');
-                    print('Feedback: ${feedbackController.text}');
                     // Clear input fields after submitting feedback
                     setState(() {
                       selectedCompany = null;
                       gdRound = null;
                       round1QuestionsController.clear();
-                      technicalRoundQuestionsController.clear();
+                      technicalRound1Controller.clear();
+                      if (technicalRounds.length > 1) {
+                        technicalRound2Controller.clear();
+                      }
+                      if (technicalRounds.length > 2) {
+                        technicalRound3Controller.clear();
+                      }
                       hrRoundQuestionsController.clear();
-                      feedbackController.clear();
                     });
                   },
                   child: Text(

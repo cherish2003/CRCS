@@ -4,7 +4,7 @@ import 'package:crcs/Pages/student_page/Attendance/EventsAtt.dart';
 import 'package:crcs/Pages/student_page/Attendance/Student_attendance.dart';
 import 'package:crcs/Pages/student_page/Attendance/check_in_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crcs/config.dart';
+import 'package:crcs/api/config.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';

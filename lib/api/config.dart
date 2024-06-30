@@ -1,4 +1,4 @@
-final url = "http://10.1.160.177:3001";
+final url = "https://pmss.srmap.edu.in";
 
 //auth
 final register = url + '/api/register';
@@ -13,7 +13,7 @@ final getStuComp = url + "/api/student/getComp";
 final getAttevts = url + "/api/student/getEventAtt";
 final postFeedBack = url + "/api/student/postStuMenFeed";
 
-// Attendancep
+// Attendance mark
 final markAtt = url + "/api/admin/markAtt";
 final submitStdAtt = url + "/api/admin/submitStdAtt";
 
